@@ -1,0 +1,22 @@
+translation_task:
+  description: >
+    Translate {sentence} from English to Korean. 
+    Maintain the original tone and ensure all technical terms are translated accurately.
+  expected_output: >
+    A perfectly translated Korean version of the news article.
+  agent: translator_agent
+
+retranslation_task:
+  description: >
+    Translate {sentence} from korean to Japanese. 
+    Maintain the original tone and ensure all technical terms are translated accurately.
+  expected_output: >
+    A perfectly translated Japanese version of the news article.
+  agent: translator_agent
+
+count_letters_task:
+  description: >
+    Count the amount of letters in {sentence}.
+  expected_output: >
+    The amount of letters in the sentence.
+  agent: count_letters_agent
