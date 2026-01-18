@@ -3,7 +3,7 @@ content_harvesting_task:
     Collect recent news articles based on {topic}.
 
     Steps include:
-    1. Use the search tool to search for recent news articles about {topic}
+    1. Use the search tool to search for recent news articles about {topic} published in {current_year}.
     2. From the search results, identify URLs from credible sources.
 
     3. **IMPORTANT: Only select actual article pages, not topic hubs or tag listings**
@@ -25,10 +25,14 @@ content_harvesting_task:
       - Use the scrape tool to extract the full article content from the URL
       - Extract metadata: title, source, publication date and complete article text.
 
-    5. Apply intelligent filtering to remove:
       - Articles shorter than 200 words
-      - Articles older than 48 hours (unless specifically relevant)
       - Pages that failed to scrape or contain no substantial content
+
+      **CRITICAL INSTRUCTION - DATE FILTERING:**
+      - Prioritize articles from the last 48 hours.
+      - **HOWEVER**, if no articles from the last 48 hours are found, YOU MUST ACCEPT older articles.
+      - **DO NOT** return an empty list just because articles are old.
+      - **ABSOLUTELY DO NOT FABRICATE NEWS**. If you cannot find any articles even after relaxing the date filter, simply return "No articles found".
 
     6. Classify each article into appropriate topic categories (Tech, Politics, Business, Science, Health, Sports, International, etc.)
 

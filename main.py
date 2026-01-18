@@ -53,6 +53,10 @@ class NewsReaderAgent:
         )
 
 
-result = NewsReaderAgent().crew().kickoff(inputs={"topic": "AI Stock"})
+result = (
+    NewsReaderAgent()
+    .crew()
+    .kickoff(inputs={"topic": "AI Stock", "current_year": "2026"})
+)
 
 print(result.tasks_output)
