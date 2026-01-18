@@ -2,51 +2,57 @@ import dotenv
 from crewai import LLM, Agent, Crew, Task
 from crewai.project import CrewBase, agent, crew, task
 
-from tools import count_letters
+from tools import scrape_tool, search_tool
 
 dotenv.load_dotenv()
 
 
 @CrewBase
-class TranslatorCrew:
+class NewsReaderAgent:
     @agent
-    def translator_agent(self) -> Agent:
+    def news_hunter_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config["translator_agent"],
-            llm=LLM(model="google/gemini-3-flash-preview", temperature=0.7),
+            config=self.agents_config["news_hunter_agent"],
+            llm=LLM(model="google/gemini-3-flash-preview"),
+            tools=[search_tool, scrape_tool],
         )
 
     @agent
-    def count_letters_agent(self) -> Agent:
+    def summarizer_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config["count_letters_agent"],
-            llm=LLM(model="google/gemini-3-flash-preview", temperature=0.7),
-            tools=[count_letters],
+            config=self.agents_config["summarizer_agent"],
+            llm=LLM(model=self.agents_config["summarizer_agent"]["llm"]),
+            tools=[scrape_tool],
+        )
+
+    @agent
+    def curator_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config["curator_agent"],
+            llm=LLM(model="google/gemini-3-flash-preview"),
         )
 
     @task
-    def translation_task(self) -> Task:
-        return Task(config=self.tasks_config["translation_task"])
+    def content_harvesting_task(self) -> Task:
+        return Task(config=self.tasks_config["content_harvesting_task"])
 
     @task
-    def retranslation_task(self) -> Task:
-        return Task(config=self.tasks_config["retranslation_task"])
+    def summarization_task(self) -> Task:
+        return Task(config=self.tasks_config["summarization_task"])
 
     @task
-    def count_letters_task(self) -> Task:
-        return Task(config=self.tasks_config["count_letters_task"])
+    def final_report_assembly_task(self) -> Task:
+        return Task(config=self.tasks_config["final_report_assembly_task"])
 
     @crew
-    def assemble_crew(self) -> Crew:
+    def crew(self) -> Crew:
         return Crew(
-            agents=self.agents,
             tasks=self.tasks,
+            agents=self.agents,
             verbose=True,
         )
 
 
-translator_crew = TranslatorCrew()
-result = translator_crew.assemble_crew().kickoff(
-    inputs={"sentence": "Hello, how are you?"}
-)
-print(result)
+result = NewsReaderAgent().crew().kickoff(inputs={"topic": "AI Stock"})
+
+print(result.tasks_output)
