@@ -42,7 +42,6 @@ summarizer_agent:
     sources into coherent narratives.
   verbose: true
   inject_date: true
-  llm: google/gemini-2.5-pro
 
 curator_agent:
   role: >
