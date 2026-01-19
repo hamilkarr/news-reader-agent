@@ -21,7 +21,7 @@ class NewsReaderAgent:
     def summarizer_agent(self) -> Agent:
         return Agent(
             config=self.agents_config["summarizer_agent"],
-            llm=LLM(model=self.agents_config["summarizer_agent"]["llm"]),
+            llm=LLM(model="google/gemini-2.0-flash-exp"),
             tools=[scrape_tool],
         )
 
@@ -56,7 +56,7 @@ class NewsReaderAgent:
 result = (
     NewsReaderAgent()
     .crew()
-    .kickoff(inputs={"topic": "AI Stock", "current_year": "2026"})
+    .kickoff(inputs={"topic": "AI Stock", "current_year": "2026", "n_articles": "3"})
 )
 
 print(result.tasks_output)

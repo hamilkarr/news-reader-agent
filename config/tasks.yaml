@@ -1,6 +1,6 @@
 content_harvesting_task:
   description: >
-    Collect recent news articles based on {topic}.
+    Collect {n_articles} recent news articles based on {topic}.
 
     Steps include:
     1. Use the search tool to search for recent news articles about {topic} published in {current_year}.
@@ -47,7 +47,7 @@ content_harvesting_task:
 
     **Collection Summary**
     - Total articles found:
-    - Articles after filtering:
+    - Articles after filtering (Target: {n_articles}):
     - Duplicates removed:
     - Sources accessed:
     - Search queries used:
@@ -74,9 +74,10 @@ content_harvesting_task:
 
 summarization_task:
   description: >
-    Take each of the URLs from the previous task and generate a summary for each article.
+    Take the articles collected in the previous task (content_harvest.md) and generate summaries for each article.
 
-    Use the scrape tool to extract the full article content from the URL.
+    **IMPORTANT: Use the article content already collected in the previous task. DO NOT scrape URLs again.**
+    Read the content from the content_harvest.md file which already contains the full article text.
 
     For each article found in the file, create:
     1. **Headline Summary** (≤280 characters, tweet-style)

@@ -17,19 +17,55 @@ def scrape_tool(url: str) -> str:
     """
     print(f"Scraping URL: {url}")
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto(url)
-        time.sleep(5)
-        html = page.content()
-        browser.close()
+    try:
+        with sync_playwright() as p:
+            # 더 많은 브라우저 옵션으로 실제 브라우저처럼 보이게 설정
+            browser = p.chromium.launch(
+                headless=True,
+                args=[
+                    "--disable-blink-features=AutomationControlled",
+                    "--disable-dev-shm-usage",
+                    "--no-sandbox",
+                ],
+            )
 
-        soup = BeautifulSoup(html, "html.parser")
+            # 컨텍스트 생성 시 User-Agent 설정
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                viewport={"width": 1920, "height": 1080},
+            )
 
-        unwanted_tags = ["script", "style", "iframe", "svg"]
-        for tag in soup.find_all(unwanted_tags):
-            tag.decompose()
+            page = context.new_page()
 
-        content = soup.get_text(separator=" ")
-        return content if content != "" else "No content"
+            # 추가 헤더 설정
+            page.set_extra_http_headers(
+                {
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                    "Accept-Language": "en-US,en;q=0.9",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Connection": "keep-alive",
+                    "Upgrade-Insecure-Requests": "1",
+                }
+            )
+
+            # 페이지 로드 - networkidle 대신 domcontentloaded 사용
+            page.goto(url, timeout=30000, wait_until="domcontentloaded")
+
+            # JavaScript 실행 대기
+            time.sleep(2)
+
+            html = page.content()
+            browser.close()
+
+            soup = BeautifulSoup(html, "html.parser")
+
+            unwanted_tags = ["script", "style", "iframe", "svg"]
+            for tag in soup.find_all(unwanted_tags):
+                tag.decompose()
+
+            content = soup.get_text(separator=" ")
+            return content if content != "" else "No content"
+
+    except Exception as e:
+        print(f"Error scraping {url}: {str(e)}")
+        return "No content"
